@@ -1,0 +1,62 @@
+FROM docker.io/library/amazonlinux:2023
+
+ENV LEPTONICA_VERSION=1.75.1
+ENV PYTHON_VERSION=3.8.10
+ENV DLIB_VERSION=19.19
+
+RUN yum -y update
+RUN yum -y upgrade
+
+RUN yum install -y which vim wget tar gzip openssl openssl-devel sqlite-devel libglvnd-glx && \
+    yum install -y java-11-amazon-corretto
+
+RUN yum install clang -y && \
+    yum install libffi-devel libpng-devel libtiff-devel zlib-devel libwebp-devel libjpeg-turbo-devel bzip2 bzip2-devel lzma xz xz-devel -y
+
+# Install leptonica
+RUN wget https://github.com/DanBloomberg/leptonica/releases/download/${LEPTONICA_VERSION}/leptonica-${LEPTONICA_VERSION}.tar.gz && \
+    tar -zxvf leptonica-${LEPTONICA_VERSION}.tar.gz && \
+    cd leptonica-${LEPTONICA_VERSION} && \
+    ./configure && \
+    make && \
+    make install
+RUN rm -rf /leptonica-${LEPTONICA_VERSION}
+
+# Install tesseract
+RUN cd ~ && \
+    yum install git-core libtool pkgconfig -y && \
+    git clone --depth 1  https://github.com/tesseract-ocr/tesseract.git tesseract-ocr && \
+    cd tesseract-ocr && \
+    export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig && \
+    ./autogen.sh && \
+    ./configure && \
+    make && \
+    make install
+RUN rm -rf /tesseract-ocr
+
+# Install python
+RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
+    tar xzf Python-${PYTHON_VERSION}.tgz && \
+    cd Python-${PYTHON_VERSION} && \
+    ./configure --enable-optimizations && \
+    make && \
+    make install
+RUN rm -rf /Python-${PYTHON_VERSION}
+
+# https://kumarvinay.com/installing-dlib-library-in-ubuntu/
+# RUN yum install build-essential cmake pkg-config libx11-dev libatlas-base-dev libgtk-3-dev libboost-python-dev -y
+# RUN wget http://dlib.net/files/${DLIB_VERSION}.tar.bz2 && \
+#     tar xvf dlib-${DLIB_VERSION}.tar.bz2 && \
+#     cd dlib-${DLIB_VERSION}/ && \
+#     mkdir build && \
+#     cd build && \
+#     cmake .. && \
+#     cmake --build . --config Release && \
+#     make install && \
+#     ldconfig && \
+#     cd .. && \
+#     pkg-config --libs --cflags dlib-1
+# RUN rm -rf /dlib-${DLIB_VERSION}
+
+# Install Dlib
+RUN pip3.8 install dlib
