@@ -7,8 +7,8 @@ ENV DLIB_VERSION=19.19
 RUN yum -y update
 RUN yum -y upgrade
 
-RUN yum install -y which vim openssl openssl-devel libffi-devel sqlite-devel libglvnd-glx bzip2 bzip2-devel lzma xz xz-devel gettext-devel && \
-    # yum install -y ImageMagick ImageMagick-devel && \
+RUN yum install -y which vim openssl openssl-devel libffi-devel sqlite-devel libglvnd-glx bzip2 bzip2-devel lzma xz xz-devel gtk3 gettext-devel && \
+    yum install -y ImageMagick ImageMagick-devel && \
     yum install -y java-11-amazon-corretto
 
 RUN yum install clang -y && \
@@ -39,7 +39,8 @@ RUN rm -rf /tesseract-ocr
 RUN curl https://github.com/ImageMagick/ImageMagick/archive/7.1.1-20.tar.gz -L -o tmp-imagemagick.tar.gz && \
     tar xf tmp-imagemagick.tar.gz && \
     cd ImageMagick-7.1.1-20 && \
-    ./configure CPPFLAGS=-I/root/build/cache/include LDFLAGS="-L/root/build/cache/lib -lstdc++" --disable-dependency-tracking --disable-shared --enable-static --prefix=/usr/local --enable-delegate-build --disable-installed  --without-modules --disable-docs --without-magick-plus-plus --without-perl --without-x --disable-openmp && \
+    # ./configure CPPFLAGS=-I/root/build/cache/include LDFLAGS="-L/root/build/cache/lib -lstdc++" --disable-dependency-tracking --disable-shared --enable-static --prefix=/usr/local --enable-delegate-build --disable-installed  --without-modules --disable-docs --without-magick-plus-plus --without-perl --without-x --disable-openmp && \
+    ./configure  --prefix=/usr/local && \
     make clean && \
     make all && \
     make install
